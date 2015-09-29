@@ -341,6 +341,45 @@ private slots:
             QWriteLocker lock(&mutex);
         }
     }
+
+    void benchQDirEntryList()
+    {
+        QDir dir = QDir::home();
+        QBENCHMARK {
+            int files = 0;
+            int folders = 0;
+            QVector<QString> entries;
+            entries.reserve(1024);
+
+            foreach (const QString& entry, dir.entryList()) {
+                QFileInfo info(dir.filePath(entry));
+                folders += info.isDir();
+                files += info.isFile();
+                entries << entry;
+            }
+
+            QCOMPARE(entries.size(), files + folders);
+        }
+    }
+
+    void benchQDirEntryInfoList()
+    {
+        QDir dir = QDir::home();
+        QBENCHMARK {
+            int files = 0;
+            int folders = 0;
+            QVector<QString> entries;
+            entries.reserve(1024);
+
+            foreach (const QFileInfo& info, dir.entryInfoList()) {
+                folders += info.isDir();
+                files += info.isFile();
+                entries << info.fileName();
+            }
+
+            QCOMPARE(entries.size(), files + folders);
+        }
+    }
 };
 }
 
