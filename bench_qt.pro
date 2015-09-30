@@ -1,10 +1,7 @@
-TEMPLATE = app
-
-QT += testlib widgets
-CONFIG += c++11 testcase release
-
-linux|mac {
-    QMAKE_CXXFLAGS += -g
-}
-
-SOURCES = bench_qt.cpp
+TEMPLATE = subdirs
+SUBDIRS = bench_alloc \
+          bench_containers \
+          bench_qdatetime \
+          bench_qdir \
+          bench_qmutex \
+          bench_qstring \
