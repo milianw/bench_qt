@@ -380,6 +380,28 @@ private slots:
             QCOMPARE(entries.size(), files + folders);
         }
     }
+
+    void benchQDirIterator()
+    {
+        QDir dir = QDir::home();
+        QBENCHMARK {
+            int files = 0;
+            int folders = 0;
+            QVector<QString> entries;
+            entries.reserve(1024);
+
+            QDirIterator it(dir);
+            while (it.hasNext()) {
+                it.next();
+                const QFileInfo& info = it.fileInfo();
+                folders += info.isDir();
+                files += info.isFile();
+                entries << info.fileName();
+            }
+
+            QCOMPARE(entries.size(), files + folders);
+        }
+    }
 };
 }
 
