@@ -35,6 +35,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 namespace {
 const size_t NUM_ALLOCS = 10000;
@@ -119,6 +120,88 @@ private slots:
             std::vector<Bar> list;
             for(size_t i = 0; i < NUM_ALLOCS; ++i) {
                 list.push_back(item);
+            }
+        }
+    }
+
+    void benchQHashIndex()
+    {
+        QHash<size_t, size_t> map;
+        map.reserve(NUM_ALLOCS);
+        for(size_t i = 0; i < NUM_ALLOCS; ++i) {
+            map[i] = i;
+        }
+        auto keys = map.keys();
+        std::random_shuffle(keys.begin(), keys.end());
+        QBENCHMARK {
+            foreach(auto key, keys) {
+                auto value = map[key];
+                Q_UNUSED(value);
+            }
+        }
+    }
+
+    void benchQMapIndex()
+    {
+        QMap<size_t, size_t> map;
+        for(size_t i = 0; i < NUM_ALLOCS; ++i) {
+            map[i] = i;
+        }
+        auto keys = map.keys();
+        std::random_shuffle(keys.begin(), keys.end());
+        QBENCHMARK {
+            foreach(auto key, keys) {
+                auto value = map[key];
+                Q_UNUSED(value);
+            }
+        }
+    }
+
+    void benchQHashForeachNaive()
+    {
+        QHash<size_t, size_t> map;
+        map.reserve(NUM_ALLOCS);
+        for(size_t i = 0; i < NUM_ALLOCS; ++i) {
+            map[i] = i;
+        }
+        QBENCHMARK {
+            foreach(auto key, map.keys()) {
+                auto value = map[key];
+                Q_UNUSED(value);
+                Q_UNUSED(key);
+            }
+        }
+    }
+
+    void benchQHashForeach()
+    {
+        QHash<size_t, size_t> map;
+        map.reserve(NUM_ALLOCS);
+        for(size_t i = 0; i < NUM_ALLOCS; ++i) {
+            map[i] = i;
+        }
+        QBENCHMARK {
+            for(auto it = map.begin(), end = map.end(); it != end; ++it) {
+                auto key = it.key();
+                auto value = it.value();
+                Q_UNUSED(value);
+                Q_UNUSED(key);
+            }
+        }
+    }
+
+    void benchQMapForeach()
+    {
+        QMap<size_t, size_t> map;
+        for(size_t i = 0; i < NUM_ALLOCS; ++i) {
+            map[i] = i;
+        }
+        QBENCHMARK {
+            for(auto it = map.begin(), end = map.end(); it != end; ++it) {
+                auto key = it.key();
+                auto value = it.value();
+                Q_UNUSED(value);
+                Q_UNUSED(key);
             }
         }
     }
