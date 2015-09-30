@@ -205,6 +205,39 @@ private slots:
             }
         }
     }
+
+    void benchQHashContainsLookup()
+    {
+        QHash<size_t, size_t> map;
+        map.reserve(NUM_ALLOCS);
+        for(size_t i = 0; i < NUM_ALLOCS; ++i) {
+            map[i] = i + 1; // assume zero is invalid
+        }
+        QBENCHMARK {
+            for(size_t i = 0; i < NUM_ALLOCS; ++i) {
+                size_t value = 0;
+                if (map.contains(i)) {
+                    value = map[i];
+                }
+                Q_UNUSED(value);
+            }
+        }
+    }
+
+    void benchQHashValueLookup()
+    {
+        QHash<size_t, size_t> map;
+        map.reserve(NUM_ALLOCS);
+        for(size_t i = 0; i < NUM_ALLOCS; ++i) {
+            map[i] = i + 1; // assume zero is invalid
+        }
+        QBENCHMARK {
+            for(size_t i = 0; i < NUM_ALLOCS; ++i) {
+                size_t value = map.value(i, 0);
+                Q_UNUSED(value);
+            }
+        }
+    }
 };
 }
 
