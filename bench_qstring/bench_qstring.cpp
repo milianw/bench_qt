@@ -34,13 +34,12 @@
 #include <QObject>
 #include <QString>
 
-namespace {
 class BenchQString : public QObject
 {
     Q_OBJECT
 
 private slots:
-    void benchQStringCompareRaw()
+    Q_NEVER_INLINE void benchQStringCompareRaw()
     {
         const QString foo = QStringLiteral("foo");
         QBENCHMARK {
@@ -49,7 +48,7 @@ private slots:
         }
     }
 
-    void benchQStringCompareLatin1()
+    Q_NEVER_INLINE void benchQStringCompareLatin1()
     {
         const QString foo = QStringLiteral("foo");
         QBENCHMARK {
@@ -58,7 +57,7 @@ private slots:
         }
     }
 
-    void benchQStringCompareLiteral()
+    Q_NEVER_INLINE void benchQStringCompareLiteral()
     {
         const QString foo = QStringLiteral("foo");
         QBENCHMARK {
@@ -67,7 +66,7 @@ private slots:
         }
     }
 
-    void benchQStringConcatSlow()
+    Q_NEVER_INLINE void benchQStringConcatSlow()
     {
         const QString foo = QStringLiteral("foo");
         const QString bar = QStringLiteral("foo");
@@ -80,7 +79,7 @@ private slots:
         }
     }
 
-    void benchQStringConcatFast()
+    Q_NEVER_INLINE void benchQStringConcatFast()
     {
         const QString foo = QStringLiteral("foo");
         const QString bar = QStringLiteral("foo");
@@ -91,7 +90,7 @@ private slots:
         }
     }
 
-    void benchQStringArgSlow()
+    Q_NEVER_INLINE void benchQStringArgSlow()
     {
         const QString foo = QStringLiteral("foo");
         const QString bar = QStringLiteral("bar");
@@ -103,7 +102,7 @@ private slots:
         }
     }
 
-    void benchQStringArgFast()
+    Q_NEVER_INLINE void benchQStringArgFast()
     {
         const QString foo = QStringLiteral("foo");
         const QString bar = QStringLiteral("bar");
@@ -115,7 +114,7 @@ private slots:
         }
     }
 
-    void benchQStringMid()
+    Q_NEVER_INLINE void benchQStringMid()
     {
         const QString needle = QStringLiteral("foo");
         const QString haystack = needle.repeated(10);
@@ -125,7 +124,7 @@ private slots:
         }
     }
 
-    void benchQStringMidRef()
+    Q_NEVER_INLINE void benchQStringMidRef()
     {
         const QString needle = QStringLiteral("foo");
         const QString haystack = needle.repeated(10);
@@ -135,7 +134,6 @@ private slots:
         }
     }
 };
-}
 
 QTEST_GUILESS_MAIN(BenchQString)
 

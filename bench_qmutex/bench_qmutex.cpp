@@ -34,7 +34,6 @@
 #include <QObject>
 #include <mutex>
 
-namespace {
 /**
  * This benchmark measures the performance of the *non-contended* overhead of
  * locking various mutex classes.
@@ -49,14 +48,14 @@ class BenchQMutex : public QObject
     Q_OBJECT
 
 private slots:
-    void benchQMutex_data()
+    Q_NEVER_INLINE void benchQMutex_data()
     {
         QTest::addColumn<bool>("recursive");
         QTest::newRow("recursive") << true;
         QTest::newRow("non-recursive") << false;
     }
 
-    void benchQMutex()
+    Q_NEVER_INLINE void benchQMutex()
     {
         QFETCH(bool, recursive);
         QMutex mutex(recursive ? QMutex::Recursive : QMutex::NonRecursive);
@@ -66,7 +65,7 @@ private slots:
         }
     }
 
-    void benchStdMutex()
+    Q_NEVER_INLINE void benchStdMutex()
     {
         std::mutex mutex;
         QBENCHMARK {
@@ -75,7 +74,7 @@ private slots:
         }
     }
 
-    void benchStdRecursiveMutex()
+    Q_NEVER_INLINE void benchStdRecursiveMutex()
     {
         std::recursive_mutex mutex;
         QBENCHMARK {
@@ -84,12 +83,12 @@ private slots:
         }
     }
 
-    void benchQReadWriteLockRead_data()
+    Q_NEVER_INLINE void benchQReadWriteLockRead_data()
     {
         benchQMutex_data();
     }
 
-    void benchQReadWriteLockRead()
+    Q_NEVER_INLINE void benchQReadWriteLockRead()
     {
         QFETCH(bool, recursive);
         QReadWriteLock mutex(recursive ? QReadWriteLock::Recursive : QReadWriteLock::NonRecursive);
@@ -99,12 +98,12 @@ private slots:
         }
     }
 
-    void benchQReadWriteLockWrite_data()
+    Q_NEVER_INLINE void benchQReadWriteLockWrite_data()
     {
         benchQMutex_data();
     }
 
-    void benchQReadWriteLockWrite()
+    Q_NEVER_INLINE void benchQReadWriteLockWrite()
     {
         QFETCH(bool, recursive);
         QReadWriteLock mutex(recursive ? QReadWriteLock::Recursive : QReadWriteLock::NonRecursive);
@@ -114,7 +113,6 @@ private slots:
         }
     }
 };
-}
 
 QTEST_GUILESS_MAIN(BenchQMutex)
 

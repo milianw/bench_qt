@@ -35,13 +35,12 @@
 #include <QDateTime>
 #include <chrono>
 
-namespace {
 class BenchQDateTime : public QObject
 {
     Q_OBJECT
 
 private slots:
-    void benchCurrentDateTime()
+    Q_NEVER_INLINE void benchCurrentDateTime()
     {
         QBENCHMARK {
             auto now = QDateTime::currentDateTime();
@@ -49,7 +48,7 @@ private slots:
         }
     }
 
-    void benchCurrentDateTimeUtc()
+    Q_NEVER_INLINE void benchCurrentDateTimeUtc()
     {
         QBENCHMARK {
             auto now = QDateTime::currentDateTimeUtc();
@@ -57,7 +56,7 @@ private slots:
         }
     }
 
-    void benchQElapsedTimer()
+    Q_NEVER_INLINE void benchQElapsedTimer()
     {
         QBENCHMARK {
             QElapsedTimer t;
@@ -65,7 +64,7 @@ private slots:
         }
     }
 
-    void benchChronoSystemClock()
+    Q_NEVER_INLINE void benchChronoSystemClock()
     {
         QBENCHMARK {
             auto now = std::chrono::system_clock::now();
@@ -73,7 +72,7 @@ private slots:
         }
     }
 
-    void benchChronoHighResolutionClock()
+    Q_NEVER_INLINE void benchChronoHighResolutionClock()
     {
         QBENCHMARK {
             auto now = std::chrono::high_resolution_clock::now();
@@ -81,7 +80,6 @@ private slots:
         }
     }
 };
-}
 
 QTEST_GUILESS_MAIN(BenchQDateTime)
 

@@ -55,6 +55,7 @@ void benchAllocType()
         }
     }
 }
+}
 
 /**
  * Various benchmarks related to the system allocator.
@@ -75,7 +76,7 @@ class BenchAlloc : public QObject
     Q_OBJECT
 
 private slots:
-    void benchMallocFree_data()
+    Q_NEVER_INLINE void benchMallocFree_data()
     {
         QTest::addColumn<size_t>("size");
         for (size_t i = 1; i <= 12; ++i) {
@@ -85,7 +86,7 @@ private slots:
     }
 
     // bench repeated malloc and free for various constant sizes
-    void benchMallocFree()
+    Q_NEVER_INLINE void benchMallocFree()
     {
         QFETCH(size_t, size);
 
@@ -101,7 +102,7 @@ private slots:
     }
 
     // bench repeated malloc and free with randomized sizes
-    void benchMallocFreeRand()
+    Q_NEVER_INLINE void benchMallocFreeRand()
     {
         std::vector<size_t> sizes(NUM_ALLOCS);
         // this distribution has it's mean value at 128, but assumes the tails
@@ -120,23 +121,23 @@ private slots:
     }
 
     // bench the repeated (de)allocation of QObject
-    void benchAllocQObject()
+    Q_NEVER_INLINE void benchAllocQObject()
     {
         benchAllocType<QObject>();
     }
 
     // bench the repeated (de)allocation of QObject
-    void benchAllocQWidget()
+    Q_NEVER_INLINE void benchAllocQWidget()
     {
         benchAllocType<QWidget>();
     }
 
-    void benchMemcpy_data()
+    Q_NEVER_INLINE void benchMemcpy_data()
     {
         benchMallocFree_data();
     }
 
-    void benchMemcpy()
+    Q_NEVER_INLINE void benchMemcpy()
     {
         QFETCH(size_t, size);
         std::vector<char> target(size);
@@ -147,7 +148,6 @@ private slots:
         }
     }
 };
-}
 
 QTEST_MAIN(BenchAlloc)
 

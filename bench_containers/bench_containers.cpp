@@ -60,7 +60,6 @@ struct BarMovable
 
 Q_DECLARE_TYPEINFO(BarMovable, Q_MOVABLE_TYPE);
 
-namespace {
 /**
  * A benchmark for various common container patterns.
  *
@@ -77,7 +76,7 @@ class BenchContainers : public QObject
 
 private slots:
     // bar is too large and every node be allocated on the heap
-    void benchQList()
+    Q_NEVER_INLINE void benchQList()
     {
         const Bar item = Bar{QStringLiteral("foo bar asdf"), 42.0};
         QBENCHMARK {
@@ -89,7 +88,7 @@ private slots:
     }
 
     // nice consecutive memory, very fast
-    void benchQVector()
+    Q_NEVER_INLINE void benchQVector()
     {
         const Bar item = Bar{QStringLiteral("foo bar asdf"), 42.0};
         QBENCHMARK {
@@ -101,7 +100,7 @@ private slots:
     }
 
     // nice consecutive memory, and simple memmove when reallocating, thus faster
-    void benchQVectorMovable()
+    Q_NEVER_INLINE void benchQVectorMovable()
     {
         const BarMovable item = BarMovable{QStringLiteral("foo bar asdf"), 42.0};
         QBENCHMARK {
@@ -113,7 +112,7 @@ private slots:
     }
 
     // also fast and can leverage move semantics internally
-    void benchVector()
+    Q_NEVER_INLINE void benchVector()
     {
         const Bar item = Bar{QStringLiteral("foo bar asdf"), 42.0};
         QBENCHMARK {
@@ -124,7 +123,7 @@ private slots:
         }
     }
 
-    void benchQHashIndex()
+    Q_NEVER_INLINE void benchQHashIndex()
     {
         QHash<size_t, size_t> map;
         map.reserve(NUM_ALLOCS);
@@ -141,7 +140,7 @@ private slots:
         }
     }
 
-    void benchQMapIndex()
+    Q_NEVER_INLINE void benchQMapIndex()
     {
         QMap<size_t, size_t> map;
         for(size_t i = 0; i < NUM_ALLOCS; ++i) {
@@ -157,7 +156,7 @@ private slots:
         }
     }
 
-    void benchQHashForeachNaive()
+    Q_NEVER_INLINE void benchQHashForeachNaive()
     {
         QHash<size_t, size_t> map;
         map.reserve(NUM_ALLOCS);
@@ -173,7 +172,7 @@ private slots:
         }
     }
 
-    void benchQHashForeach()
+    Q_NEVER_INLINE void benchQHashForeach()
     {
         QHash<size_t, size_t> map;
         map.reserve(NUM_ALLOCS);
@@ -190,7 +189,7 @@ private slots:
         }
     }
 
-    void benchQMapForeach()
+    Q_NEVER_INLINE void benchQMapForeach()
     {
         QMap<size_t, size_t> map;
         for(size_t i = 0; i < NUM_ALLOCS; ++i) {
@@ -206,7 +205,7 @@ private slots:
         }
     }
 
-    void benchQHashContainsLookup()
+    Q_NEVER_INLINE void benchQHashContainsLookup()
     {
         QHash<size_t, size_t> map;
         map.reserve(NUM_ALLOCS);
@@ -224,7 +223,7 @@ private slots:
         }
     }
 
-    void benchQHashValueLookup()
+    Q_NEVER_INLINE void benchQHashValueLookup()
     {
         QHash<size_t, size_t> map;
         map.reserve(NUM_ALLOCS);
@@ -239,7 +238,6 @@ private slots:
         }
     }
 };
-}
 
 QTEST_GUILESS_MAIN(BenchContainers)
 

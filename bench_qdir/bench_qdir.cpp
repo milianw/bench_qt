@@ -33,7 +33,6 @@
 #include <QtTest>
 #include <QObject>
 
-namespace {
 /**
  * A benchmark for common QDir operations.
  *
@@ -54,7 +53,7 @@ class BenchQDir : public QObject
     Q_OBJECT
 
 private slots:
-    void benchQDirEntryList()
+    Q_NEVER_INLINE void benchQDirEntryList()
     {
         QDir dir = QDir::home();
         QBENCHMARK {
@@ -74,7 +73,7 @@ private slots:
         }
     }
 
-    void benchQDirEntryInfoList()
+    Q_NEVER_INLINE void benchQDirEntryInfoList()
     {
         QDir dir = QDir::home();
         QBENCHMARK {
@@ -93,7 +92,7 @@ private slots:
         }
     }
 
-    void benchQDirIterator()
+    Q_NEVER_INLINE void benchQDirIterator()
     {
         QDir dir = QDir::home();
         QBENCHMARK {
@@ -115,7 +114,6 @@ private slots:
         }
     }
 };
-}
 
 QTEST_GUILESS_MAIN(BenchQDir)
 
