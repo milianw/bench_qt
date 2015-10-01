@@ -43,13 +43,9 @@ const size_t NUM_ALLOCS = 1000;
 template<typename T>
 void benchAllocType()
 {
-    std::vector<T*> allocated(NUM_ALLOCS);
     QBENCHMARK {
-        for (auto& p : allocated) {
-            p = new T;
-            __iteration_controller.next();
-        }
-        for (auto p : allocated) {
+        for (size_t i = 0; i < NUM_ALLOCS; ++i) {
+            T* p = new T;
             delete p;
             __iteration_controller.next();
         }
@@ -88,13 +84,9 @@ private slots:
     void benchMallocFree()
     {
         QFETCH(size_t, size);
-        std::vector<void*> allocated(NUM_ALLOCS);
         QBENCHMARK {
-            for (auto& p : allocated) {
-                p = malloc(size);
-                __iteration_controller.next();
-            }
-            for (auto p : allocated) {
+            for (size_t i = 0; i < NUM_ALLOCS; ++i) {
+                void* p = malloc(size);
                 free(p);
                 __iteration_controller.next();
             }
@@ -104,7 +96,6 @@ private slots:
     // bench repeated malloc and free with randomized sizes
     void benchMallocFreeRand()
     {
-        std::vector<void*> allocated(NUM_ALLOCS);
         std::vector<size_t> sizes(NUM_ALLOCS);
         // this distribution has it's mean value at 128, but assumes the tails
         // on both sides are equally common which is not the case.
@@ -112,10 +103,7 @@ private slots:
         std::generate(sizes.begin(), sizes.end(), [] { return 1 << (std::rand() % 12 + 1); });
         QBENCHMARK {
             for (size_t i = 0; i < NUM_ALLOCS; ++i) {
-                allocated[i] = malloc(sizes[i]);
-                __iteration_controller.next();
-            }
-            for (auto p : allocated) {
+                void* p = malloc(sizes[i]);
                 free(p);
                 __iteration_controller.next();
             }
@@ -132,6 +120,21 @@ private slots:
     void benchAllocQWidget()
     {
         benchAllocType<QWidget>();
+    }
+
+    void benchMemcpy_data()
+    {
+        benchMallocFree_data();
+    }
+
+    void benchMemcpy()
+    {
+        QFETCH(size_t, size);
+        std::vector<char> target(size);
+        std::vector<char> source(size);
+        QBENCHMARK {
+            memcpy(target.data(), source.data(), size);
+        }
     }
 };
 }
