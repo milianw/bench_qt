@@ -35,6 +35,8 @@
 #include <QDateTime>
 #include <chrono>
 
+#include "../util.h"
+
 class BenchQDateTime : public QObject
 {
     Q_OBJECT
@@ -43,16 +45,22 @@ private slots:
     Q_NEVER_INLINE void benchCurrentDateTime()
     {
         QBENCHMARK {
-            auto now = QDateTime::currentDateTime();
-            Q_UNUSED(now);
+            auto a = QDateTime::currentDateTime();
+            escape(&a);
+            auto b = QDateTime::currentDateTime();
+            auto diff = a.msecsTo(b);
+            escape(&diff);
         }
     }
 
     Q_NEVER_INLINE void benchCurrentDateTimeUtc()
     {
         QBENCHMARK {
-            auto now = QDateTime::currentDateTimeUtc();
-            Q_UNUSED(now);
+            auto a = QDateTime::currentDateTimeUtc();
+            clobber();
+            auto b = QDateTime::currentDateTimeUtc();
+            auto diff = a.msecsTo(b);
+            escape(&diff);
         }
     }
 
@@ -61,22 +69,31 @@ private slots:
         QBENCHMARK {
             QElapsedTimer t;
             t.start();
+            escape(&t);
+            auto diff = t.elapsed();
+            escape(&diff);
         }
     }
 
     Q_NEVER_INLINE void benchChronoSystemClock()
     {
         QBENCHMARK {
-            auto now = std::chrono::system_clock::now();
-            Q_UNUSED(now);
+            auto a = std::chrono::system_clock::now();
+            escape(&a);
+            auto b = std::chrono::system_clock::now();
+            auto diff = std::chrono::duration_cast<std::chrono::microseconds>(b - a);
+            escape(&diff);
         }
     }
 
     Q_NEVER_INLINE void benchChronoHighResolutionClock()
     {
         QBENCHMARK {
-            auto now = std::chrono::high_resolution_clock::now();
-            Q_UNUSED(now);
+            auto a = std::chrono::high_resolution_clock::now();
+            escape(&a);
+            auto b = std::chrono::high_resolution_clock::now();
+            auto diff = std::chrono::duration_cast<std::chrono::microseconds>(b - a);
+            escape(&diff);
         }
     }
 };
