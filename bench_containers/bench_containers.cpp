@@ -37,12 +37,18 @@
 #include <vector>
 #include <algorithm>
 
+#include "../util.h"
+
 namespace {
+
 const size_t NUM_ALLOCS = 10000;
+
 struct Foo
 {
     QStringList strings() const
-    { return m_strings; }
+    {
+        return m_strings;
+    }
     QStringList m_strings;
 };
 
@@ -56,6 +62,7 @@ struct BarMovable
     QString a;
     double b;
 };
+
 }
 
 Q_DECLARE_TYPEINFO(BarMovable, Q_MOVABLE_TYPE);
@@ -84,6 +91,7 @@ private slots:
             for(size_t i = 0; i < NUM_ALLOCS; ++i) {
                 list.append(item);
             }
+            escape(&list);
         }
     }
 
@@ -96,6 +104,7 @@ private slots:
             for(size_t i = 0; i < NUM_ALLOCS; ++i) {
                 list.append(item);
             }
+            escape(&list);
         }
     }
 
@@ -108,6 +117,7 @@ private slots:
             for(size_t i = 0; i < NUM_ALLOCS; ++i) {
                 list.append(item);
             }
+            escape(&list);
         }
     }
 
@@ -120,6 +130,7 @@ private slots:
             for(size_t i = 0; i < NUM_ALLOCS; ++i) {
                 list.push_back(item);
             }
+            escape(&list);
         }
     }
 
@@ -135,7 +146,7 @@ private slots:
         QBENCHMARK {
             foreach(auto key, keys) {
                 auto value = map[key];
-                Q_UNUSED(value);
+                escape(&value);
             }
         }
     }
@@ -151,7 +162,7 @@ private slots:
         QBENCHMARK {
             foreach(auto key, keys) {
                 auto value = map[key];
-                Q_UNUSED(value);
+                escape(&value);
             }
         }
     }
@@ -166,8 +177,8 @@ private slots:
         QBENCHMARK {
             foreach(auto key, map.keys()) {
                 auto value = map[key];
-                Q_UNUSED(value);
-                Q_UNUSED(key);
+                escape(&key);
+                escape(&value);
             }
         }
     }
@@ -183,8 +194,8 @@ private slots:
             for(auto it = map.begin(), end = map.end(); it != end; ++it) {
                 auto key = it.key();
                 auto value = it.value();
-                Q_UNUSED(value);
-                Q_UNUSED(key);
+                escape(&key);
+                escape(&value);
             }
         }
     }
@@ -199,8 +210,8 @@ private slots:
             for(auto it = map.begin(), end = map.end(); it != end; ++it) {
                 auto key = it.key();
                 auto value = it.value();
-                Q_UNUSED(value);
-                Q_UNUSED(key);
+                escape(&key);
+                escape(&value);
             }
         }
     }
@@ -218,7 +229,7 @@ private slots:
                 if (map.contains(i)) {
                     value = map[i];
                 }
-                Q_UNUSED(value);
+                escape(&value);
             }
         }
     }
@@ -233,7 +244,7 @@ private slots:
         QBENCHMARK {
             for(size_t i = 0; i < NUM_ALLOCS; ++i) {
                 size_t value = map.value(i, 0);
-                Q_UNUSED(value);
+                escape(&value);
             }
         }
     }
