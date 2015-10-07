@@ -34,6 +34,8 @@
 #include <QObject>
 #include <mutex>
 
+#include "../util.h"
+
 /**
  * This benchmark measures the performance of the *non-contended* overhead of
  * locking various mutex classes.
@@ -61,7 +63,7 @@ private slots:
         QMutex mutex(recursive ? QMutex::Recursive : QMutex::NonRecursive);
         QBENCHMARK {
             QMutexLocker lock(&mutex);
-            Q_UNUSED(lock);
+            clobber();
         }
     }
 
@@ -70,7 +72,7 @@ private slots:
         std::mutex mutex;
         QBENCHMARK {
             std::lock_guard<std::mutex> lock(mutex);
-            Q_UNUSED(lock);
+            clobber();
         }
     }
 
@@ -79,7 +81,7 @@ private slots:
         std::recursive_mutex mutex;
         QBENCHMARK {
             std::lock_guard<std::recursive_mutex> lock(mutex);
-            Q_UNUSED(lock);
+            clobber();
         }
     }
 
@@ -94,7 +96,7 @@ private slots:
         QReadWriteLock mutex(recursive ? QReadWriteLock::Recursive : QReadWriteLock::NonRecursive);
         QBENCHMARK {
             QReadLocker lock(&mutex);
-            Q_UNUSED(lock);
+            clobber();
         }
     }
 
@@ -109,7 +111,7 @@ private slots:
         QReadWriteLock mutex(recursive ? QReadWriteLock::Recursive : QReadWriteLock::NonRecursive);
         QBENCHMARK {
             QWriteLocker lock(&mutex);
-            Q_UNUSED(lock);
+            clobber();
         }
     }
 };
