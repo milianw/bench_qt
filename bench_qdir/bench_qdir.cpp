@@ -33,6 +33,8 @@
 #include <QtTest>
 #include <QObject>
 
+#include "../util.h"
+
 /**
  * A benchmark for common QDir operations.
  *
@@ -57,19 +59,14 @@ private slots:
     {
         QDir dir = QDir::home();
         QBENCHMARK {
-            int files = 0;
-            int folders = 0;
-            QVector<QString> entries;
-            entries.reserve(1024);
-
             foreach (const QString& entry, dir.entryList()) {
-                QFileInfo info(dir.filePath(entry));
-                folders += info.isDir();
-                files += info.isFile();
-                entries << entry;
+                const QFileInfo info(dir.filePath(entry));
+                bool isFolder = info.isDir();
+                bool isFile = info.isFile();
+                escape(&isFolder);
+                escape(&isFile);
+                escape(&entry);
             }
-
-            QCOMPARE(entries.size(), files + folders);
         }
     }
 
@@ -77,18 +74,14 @@ private slots:
     {
         QDir dir = QDir::home();
         QBENCHMARK {
-            int files = 0;
-            int folders = 0;
-            QVector<QString> entries;
-            entries.reserve(1024);
-
             foreach (const QFileInfo& info, dir.entryInfoList()) {
-                folders += info.isDir();
-                files += info.isFile();
-                entries << info.fileName();
+                const QString& entry = info.fileName();
+                bool isFolder = info.isDir();
+                bool isFile = info.isFile();
+                escape(&isFolder);
+                escape(&isFile);
+                escape(&entry);
             }
-
-            QCOMPARE(entries.size(), files + folders);
         }
     }
 
@@ -96,21 +89,17 @@ private slots:
     {
         QDir dir = QDir::home();
         QBENCHMARK {
-            int files = 0;
-            int folders = 0;
-            QVector<QString> entries;
-            entries.reserve(1024);
-
             QDirIterator it(dir);
             while (it.hasNext()) {
                 it.next();
                 const QFileInfo& info = it.fileInfo();
-                folders += info.isDir();
-                files += info.isFile();
-                entries << info.fileName();
+                const QString& entry = info.fileName();
+                bool isFolder = info.isDir();
+                bool isFile = info.isFile();
+                escape(&isFolder);
+                escape(&isFile);
+                escape(&entry);
             }
-
-            QCOMPARE(entries.size(), files + folders);
         }
     }
 };

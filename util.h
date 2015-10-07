@@ -42,6 +42,11 @@ inline void escape(void *p)
     asm volatile("" : : "g"(p) : "memory");
 }
 
+inline void escape(const void *p)
+{
+    escape(const_cast<void*>(p));
+}
+
 inline void clobber()
 {
     asm volatile("" : : : "memory");
