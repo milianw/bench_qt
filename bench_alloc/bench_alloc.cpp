@@ -40,7 +40,7 @@
 #include "../util.h"
 
 namespace {
-const size_t NUM_ALLOCS = 1000;
+const size_t NUM_ALLOCS = 10000;
 
 template<typename T>
 void benchAllocType()
@@ -76,13 +76,73 @@ class BenchAlloc : public QObject
     Q_OBJECT
 
 private slots:
-    Q_NEVER_INLINE void benchMallocFree_data()
+    Q_NEVER_INLINE void benchMalloc_data()
     {
         QTest::addColumn<size_t>("size");
         for (size_t i = 1; i <= 12; ++i) {
             size_t size = 1 << i;
             QTest::newRow(std::to_string(size).data()) << size;
         }
+    }
+
+    // bench repeated malloc for various constant sizes
+    Q_NEVER_INLINE void benchMalloc()
+    {
+        QFETCH(size_t, size);
+
+        QVector<void*> ptrs(NUM_ALLOCS);
+
+        QBENCHMARK {
+            for (size_t i = 0; i < NUM_ALLOCS; ++i) {
+                void* p = malloc(size);
+                escape(p);
+                ptrs[i] = p;
+                clobber();
+                __iteration_controller.next();
+            }
+            clobber();
+            // TODO: find a way to do this outside of the measured section
+            //       but b/c QBENCHMARK uses the median value this should still
+            //       be OK
+            for (size_t i = 0; i < NUM_ALLOCS; ++i) {
+                free(ptrs[i]);
+            }
+            __iteration_controller.next();
+        }
+    }
+
+    Q_NEVER_INLINE void benchFree_data()
+    {
+        benchMalloc_data();
+    }
+
+    // bench repeated malloc for various constant sizes
+    Q_NEVER_INLINE void benchFree()
+    {
+        QFETCH(size_t, size);
+
+        QVector<void*> ptrs(NUM_ALLOCS);
+
+        QBENCHMARK {
+            // TODO: find a way to do this outside of the measured section
+            //       but b/c QBENCHMARK uses the median value this should still
+            //       be OK
+            for (size_t i = 0; i < NUM_ALLOCS; ++i) {
+                ptrs[i] = malloc(size);
+            }
+            __iteration_controller.next();
+            clobber();
+            for (size_t i = 0; i < NUM_ALLOCS; ++i) {
+                free(ptrs[i]);
+                clobber();
+                __iteration_controller.next();
+            }
+        }
+    }
+
+    Q_NEVER_INLINE void benchMallocFree_data()
+    {
+        benchMalloc_data();
     }
 
     // bench repeated malloc and free for various constant sizes
