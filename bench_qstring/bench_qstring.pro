@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += testlib
+QT += testlib core_private
 CONFIG += c++11 testcase release
 
 LIBS += -licuuc

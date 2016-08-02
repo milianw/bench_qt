@@ -36,10 +36,9 @@
 #include "../util.h"
 
 #include <codecvt>
-#include <unicode/ucnv.h>
 
 template<int MAX_SIZE>
-class ConvertQStringToUtf8
+class ConvertQStringToUtf8_codecvt
 {
 public:
   const char* operator() (const QString& string)
@@ -59,10 +58,12 @@ private:
 };
 
 // like qUtf8Printable, but faster yet limited to a certain maximum size
-#define qFastUtf8Printable(max_size, string) ConvertQStringToUtf8<max_size>()(string)
+#define qFastUtf8Printable_codecvt(max_size, string) ConvertQStringToUtf8_codecvt<max_size>()(string)
+
+#include <unicode/ucnv.h>
 
 template<int MAX_SIZE>
-class ConvertQStringToUtf8_2
+class ConvertQStringToUtf8_ICU
 {
 public:
   const char* operator() (const QString& string)
@@ -84,7 +85,37 @@ private:
   char m_buffer[MAX_SIZE] = {0};
 };
 
-#define qFastUtf8Printable2(max_size, string) ConvertQStringToUtf8_2<max_size>()(string)
+#define qFastUtf8Printable_ICU(max_size, string) ConvertQStringToUtf8_ICU<max_size>()(string)
+
+#include <private/qutfcodec_p.h>
+
+template<int MAX_SIZE>
+class ConvertQStringToUtf8_QUtf8Functions
+{
+public:
+  const char* operator() (const QString& string)
+  {
+    uchar *dst = reinterpret_cast<uchar*>(m_buffer);
+    uchar * const dstEnd = reinterpret_cast<uchar*>(std::end(m_buffer) - 1);
+    const ushort *src = string.utf16();
+    const ushort *const end = src + string.size();
+    while (src != end && dst < dstEnd) {
+      ushort uc = *src++;
+      int res = QUtf8Functions::toUtf8<QUtf8BaseTraits>(uc, dst, src, end);
+      if (res < 0) {
+        // encoding error - append '?'
+        *dst++ = '?';
+      }
+    }
+    *dst = 0;
+    return m_buffer;
+  }
+
+private:
+  char m_buffer[MAX_SIZE] = {0};
+};
+
+#define qFastUtf8Printable_QUtf8Functions(max_size, string) ConvertQStringToUtf8_QUtf8Functions<max_size>()(string)
 
 class BenchQString : public QObject
 {
@@ -206,15 +237,23 @@ private slots:
     {
         const QString string = QStringLiteral("123456789012345678901234567890");
         QBENCHMARK {
-            escape(qFastUtf8Printable(64, string));
+            escape(qFastUtf8Printable_codecvt(64, string));
         }
     }
 
-    Q_NEVER_INLINE void benchQFastUtf8Printable2()
+    Q_NEVER_INLINE void benchQFastUtf8Printable_icu()
     {
         const QString string = QStringLiteral("123456789012345678901234567890");
         QBENCHMARK {
-            escape(qFastUtf8Printable2(64, string));
+            escape(qFastUtf8Printable_ICU(64, string));
+        }
+    }
+
+    Q_NEVER_INLINE void benchQFastUtf8Printable_QUtf8Functions()
+    {
+        const QString string = QStringLiteral("123456789012345678901234567890");
+        QBENCHMARK {
+            escape(qFastUtf8Printable_QUtf8Functions(64, string));
         }
     }
 };
