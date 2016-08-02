@@ -36,6 +36,7 @@
 #include "../util.h"
 
 #include <codecvt>
+#include <unicode/ucnv.h>
 
 template<int MAX_SIZE>
 class ConvertQStringToUtf8
@@ -59,6 +60,31 @@ private:
 
 // like qUtf8Printable, but faster yet limited to a certain maximum size
 #define qFastUtf8Printable(max_size, string) ConvertQStringToUtf8<max_size>()(string)
+
+template<int MAX_SIZE>
+class ConvertQStringToUtf8_2
+{
+public:
+  const char* operator() (const QString& string)
+  {
+    UErrorCode status = U_ZERO_ERROR;
+    static UConverter *converter = ucnv_open("UTF-8", &status);
+    if (U_FAILURE(status)) {
+        fprintf(stderr, "failed to get utf8 converter (%d: %s)\n", status, u_errorName(status));
+        return m_buffer;
+    }
+    ucnv_fromUChars(converter, m_buffer, MAX_SIZE - 1, string.utf16(), string.size(), &status);
+    if (U_FAILURE(status)) {
+        fprintf(stderr, "failed to convert string to utf8 (%d: %s)\n", status, u_errorName(status));
+    }
+    return m_buffer;
+  }
+
+private:
+  char m_buffer[MAX_SIZE] = {0};
+};
+
+#define qFastUtf8Printable2(max_size, string) ConvertQStringToUtf8_2<max_size>()(string)
 
 class BenchQString : public QObject
 {
@@ -181,6 +207,14 @@ private slots:
         const QString string = QStringLiteral("123456789012345678901234567890");
         QBENCHMARK {
             escape(qFastUtf8Printable(64, string));
+        }
+    }
+
+    Q_NEVER_INLINE void benchQFastUtf8Printable2()
+    {
+        const QString string = QStringLiteral("123456789012345678901234567890");
+        QBENCHMARK {
+            escape(qFastUtf8Printable2(64, string));
         }
     }
 };
