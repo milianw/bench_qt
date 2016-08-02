@@ -35,6 +35,31 @@
 #include <QString>
 #include "../util.h"
 
+#include <codecvt>
+
+template<int MAX_SIZE>
+class ConvertQStringToUtf8
+{
+public:
+  const char* operator() (const QString& string)
+  {
+    std::codecvt_utf8_utf16<char16_t> codec;
+    std::mbstate_t state;
+    const char16_t* from_next = nullptr;
+    char* to_next = nullptr;
+    codec.out(state,
+              reinterpret_cast<const char16_t*>(string.utf16()), reinterpret_cast<const char16_t*>(string.utf16() + string.size()), from_next,
+              std::begin(m_buffer), std::end(m_buffer) - 1, to_next);
+    return m_buffer;
+  }
+
+private:
+  char m_buffer[MAX_SIZE] = {0};
+};
+
+// like qUtf8Printable, but faster yet limited to a certain maximum size
+#define qFastUtf8Printable(max_size, string) ConvertQStringToUtf8<max_size>()(string)
+
 class BenchQString : public QObject
 {
     Q_OBJECT
@@ -148,6 +173,14 @@ private slots:
         const QString string = QStringLiteral("123456789012345678901234567890");
         QBENCHMARK {
             escape(qUtf8Printable(string));
+        }
+    }
+
+    Q_NEVER_INLINE void benchQFastUtf8Printable()
+    {
+        const QString string = QStringLiteral("123456789012345678901234567890");
+        QBENCHMARK {
+            escape(qFastUtf8Printable(64, string));
         }
     }
 };
