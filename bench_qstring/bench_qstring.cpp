@@ -33,6 +33,7 @@
 #include <QtTest>
 #include <QObject>
 #include <QString>
+#include "../util.h"
 
 class BenchQString : public QObject
 {
@@ -131,6 +132,22 @@ private slots:
         QBENCHMARK {
             bool equal = haystack.midRef(needle.length(), needle.length()) == needle;
             Q_UNUSED(equal);
+        }
+    }
+
+    Q_NEVER_INLINE void benchQPrintable()
+    {
+        const QString string = QStringLiteral("123456789012345678901234567890");
+        QBENCHMARK {
+            escape(qPrintable(string));
+        }
+    }
+
+    Q_NEVER_INLINE void benchQUtf8Printable()
+    {
+        const QString string = QStringLiteral("123456789012345678901234567890");
+        QBENCHMARK {
+            escape(qUtf8Printable(string));
         }
     }
 };
