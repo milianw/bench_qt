@@ -126,8 +126,9 @@ private slots:
     {
         const QString foo = QStringLiteral("foo");
         QBENCHMARK {
+            clobber();
             bool equal = (foo == "foo");
-            Q_UNUSED(equal);
+            escape(&equal);
         }
     }
 
@@ -135,8 +136,9 @@ private slots:
     {
         const QString foo = QStringLiteral("foo");
         QBENCHMARK {
+            clobber();
             bool equal = (foo == QLatin1String("foo"));
-            Q_UNUSED(equal);
+            escape(&equal);
         }
     }
 
@@ -144,8 +146,9 @@ private slots:
     {
         const QString foo = QStringLiteral("foo");
         QBENCHMARK {
+            clobber();
             bool equal = (foo == QStringLiteral("foo"));
-            Q_UNUSED(equal);
+            escape(&equal);
         }
     }
 
@@ -155,10 +158,11 @@ private slots:
         const QString bar = QStringLiteral("foo");
         const QString asdf = QStringLiteral("asdf");
         QBENCHMARK {
+            clobber();
             QString concat = foo;
             concat += bar;
             concat += asdf;
-            Q_UNUSED(concat);
+            escape(&concat);
         }
     }
 
@@ -168,8 +172,9 @@ private slots:
         const QString bar = QStringLiteral("foo");
         const QString asdf = QStringLiteral("asdf");
         QBENCHMARK {
+            clobber();
             QString concat = foo % bar % asdf;
-            Q_UNUSED(concat);
+            escape(&concat);
         }
     }
 
@@ -180,8 +185,9 @@ private slots:
         const QString asdf = QStringLiteral("asdf");
         const QString tpl = QStringLiteral("foo: %1, bar: %2, asdf: %3");
         QBENCHMARK {
+            clobber();
             QString concat =  tpl.arg(foo).arg(bar).arg(asdf);
-            Q_UNUSED(concat);
+            escape(&concat);
         }
     }
 
@@ -202,8 +208,9 @@ private slots:
         const QString needle = QStringLiteral("foo");
         const QString haystack = needle.repeated(10);
         QBENCHMARK {
+            clobber();
             bool equal = haystack.mid(needle.length(), needle.length()) == needle;
-            Q_UNUSED(equal);
+            escape(&equal);
         }
     }
 
@@ -212,8 +219,9 @@ private slots:
         const QString needle = QStringLiteral("foo");
         const QString haystack = needle.repeated(10);
         QBENCHMARK {
+            clobber();
             bool equal = haystack.midRef(needle.length(), needle.length()) == needle;
-            Q_UNUSED(equal);
+            escape(&equal);
         }
     }
 
