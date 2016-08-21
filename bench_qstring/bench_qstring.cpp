@@ -152,6 +152,28 @@ private slots:
         }
     }
 
+    Q_NEVER_INLINE void benchQStringContains()
+    {
+        const QString foo = QStringLiteral("foobarasdf");
+        const QString pattern = QStringLiteral("bar");
+        QBENCHMARK {
+            clobber();
+            auto i = foo.indexOf(pattern);
+            escape(&i);
+        }
+    }
+
+    Q_NEVER_INLINE void benchQStringMatcher()
+    {
+        const QString foo = QStringLiteral("foobarasdf");
+        QStringMatcher matcher(QStringLiteral("bar"));
+        QBENCHMARK {
+            clobber();
+            auto i = matcher.indexIn(foo);
+            escape(&i);
+        }
+    }
+
     Q_NEVER_INLINE void benchQStringConcatSlow()
     {
         const QString foo = QStringLiteral("foo");
