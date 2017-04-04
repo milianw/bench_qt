@@ -96,6 +96,17 @@ private slots:
             escape(&diff);
         }
     }
+
+    Q_NEVER_INLINE void benchChronoSteadyClock()
+    {
+        QBENCHMARK {
+            auto a = std::chrono::steady_clock::now();
+            escape(&a);
+            auto b = std::chrono::steady_clock::now();
+            auto diff = std::chrono::duration_cast<std::chrono::microseconds>(b - a);
+            escape(&diff);
+        }
+    }
 };
 
 QTEST_GUILESS_MAIN(BenchQDateTime)
