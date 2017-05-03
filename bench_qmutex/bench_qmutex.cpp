@@ -49,7 +49,24 @@ class BenchQMutex : public QObject
 {
     Q_OBJECT
 
+private:
+    // ensure at least two threads are running
+    QThread secondaryThread;
+
 private slots:
+    void initTestCase()
+    {
+        QSignalSpy spy(&secondaryThread, &QThread::started);
+        secondaryThread.start();
+        QVERIFY(spy.wait());
+    }
+
+    void cleanupTestCase()
+    {
+        secondaryThread.quit();
+        QVERIFY(secondaryThread.wait());
+    }
+
     Q_NEVER_INLINE void benchQMutex_data()
     {
         QTest::addColumn<bool>("recursive");
