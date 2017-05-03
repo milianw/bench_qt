@@ -74,7 +74,7 @@ public:
         fprintf(stderr, "failed to get utf8 converter (%d: %s)\n", status, u_errorName(status));
         return m_buffer;
     }
-    ucnv_fromUChars(converter, m_buffer, MAX_SIZE - 1, string.utf16(), string.size(), &status);
+    ucnv_fromUChars(converter, m_buffer, MAX_SIZE - 1, reinterpret_cast<const UChar*>(string.utf16()), string.size(), &status);
     if (U_FAILURE(status)) {
         fprintf(stderr, "failed to convert string to utf8 (%d: %s)\n", status, u_errorName(status));
     }
