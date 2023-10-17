@@ -64,6 +64,39 @@ private slots:
         }
     }
 
+    Q_NEVER_INLINE void benchFromMSecsSinceEpoch()
+    {
+        qint64 msecs = 0;
+        clobber();
+
+        QBENCHMARK {
+            auto a = QDateTime::fromMSecsSinceEpoch(msecs);
+            escape(&a);
+        }
+    }
+
+    Q_NEVER_INLINE void benchFromMSecsSinceEpochToUTC()
+    {
+        qint64 msecs = 0;
+        clobber();
+
+        QBENCHMARK {
+            auto a = QDateTime::fromMSecsSinceEpoch(msecs).toUTC();
+            escape(&a);
+        }
+    }
+
+    Q_NEVER_INLINE void benchFromMSecsSinceEpochUTC()
+    {
+        qint64 msecs = 0;
+        clobber();
+
+        QBENCHMARK {
+            auto a = QDateTime::fromMSecsSinceEpoch(msecs, Qt::UTC);
+            escape(&a);
+        }
+    }
+
     Q_NEVER_INLINE void benchQElapsedTimer()
     {
         QBENCHMARK {
